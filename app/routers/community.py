@@ -15,7 +15,6 @@ def create_community(community: schemas.CommunityCreate, db: Session = Depends(g
     
     hashed_password = utils.hash(community.password)
     community_dict = community.dict()
-    community_dict.pop("confirm_password")
     community_dict["password"] = hashed_password
     
     new_community = models.Community(**community_dict)
