@@ -28,6 +28,7 @@ class User(Base):
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=text('now()'))
+    join_requests = relationship("JoinRequest", back_populates="users")
 
 
 
@@ -45,7 +46,19 @@ class Community(Base):
     __tablename__ = "community"
     id = Column(Integer, primary_key=True, nullable=False)
     community_name = Column(String, nullable=False)
-    admin_email = Column(String, nullable=False, unique=True)
+    admin_email = Column(String, nullable=False)
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    join_requests = relationship("JoinRequest", back_populates="community")
 
+
+
+class JoinRequest(Base):
+    __tablename__ = "join_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    community_id = Column(Integer, ForeignKey("community.id"))
+
+    users = relationship("User", back_populates="join_requests")
+    community = relationship("Community", back_populates="join_requests")
