@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey,Text,DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -50,6 +50,7 @@ class Community(Base):
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     join_requests = relationship("JoinRequest", back_populates="community")
+    events = relationship("Event", back_populates="community")
 
 
 
@@ -62,3 +63,15 @@ class JoinRequest(Base):
 
     users = relationship("User", back_populates="join_requests")
     community = relationship("Community", back_populates="join_requests")
+    
+class Event(Base):
+    __tablename__ = "event"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(Text)
+    date_time = Column(DateTime, nullable=False)
+    community_id = Column(Integer, ForeignKey("community.id", ondelete="CASCADE"), nullable=False)
+
+    # Define a relationship with the Community model
+    community = relationship("Community", back_populates="events")

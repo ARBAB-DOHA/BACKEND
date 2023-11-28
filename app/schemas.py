@@ -77,3 +77,8 @@ class CommunityOut(BaseModel):
 class Vote(BaseModel):
     post_id: int
     dir: conint(le=1)
+
+class EventCreate(BaseModel):
+    title: str
+    description: str
+    date_time: datetime
