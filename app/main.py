@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import models
-from .routers import post, user, auth, vote, community,event
+from .routers import post, user, auth, vote, community,event,comment
 
 from .config import settings
 
@@ -27,6 +27,7 @@ app.include_router(auth.router)
 app.include_router(vote.router)
 app.include_router(community.router)
 app.include_router(event.router)
+app.include_router(comment.router)
 
 
 @app.get("/")

@@ -126,3 +126,20 @@ class UserOut(BaseModel):
         from_attributes = True
 
 
+class CommentBase(BaseModel):
+    content: str
+
+class CommentCreate(BaseModel):
+    content: str
+
+class Comment(CommentBase):
+    user_id: int
+    post_id: Optional[int] = None
+    event_id: Optional[int] = None
+    parent_comment_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class CommentWithReplies(Comment):
+    replies: List[Comment] = []

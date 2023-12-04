@@ -1,11 +1,14 @@
 # In your crud.py file
+from typing import Optional
 from sqlalchemy.orm import Session
 from . import models  # Import your existing SQLAlchemy models
-from .schemas import EventCreate
+from .schemas import Comment, CommentCreate, EventCreate
 
-from app.models import User, Post, Event
+from app.models import User, Post, Event,Comment
 from datetime import datetime
-from app.schemas import UserDashboard
+from app.schemas import UserDashboard, CommentCreate
+
+
 
 def create_event(db: Session, event: EventCreate, community_id: int):
     db_event = models.Event(**event.dict(), community_id=community_id)
@@ -35,3 +38,36 @@ def get_user_data(user_id: int, db: Session):
     notifications = ["New post in community ", "Event starting soon",]  # Fetch or generate notifications
 
     return {"user": user, "dashboard": UserDashboard(recent_posts=recent_posts, upcoming_events=upcoming_events, notifications=notifications)}
+
+def create_comment(
+    db: Session, comment: CommentCreate, user_id: int, post_id: Optional[int] = None, event_id: Optional[int] = None, parent_comment_id: Optional[int] = None
+):
+    # Set created_at to the current timestamp
+    
+
+    db_comment = Comment(
+        content=comment.content,
+        user_id=user_id,
+        post_id=post_id,
+        event_id=event_id,
+        parent_comment_id=parent_comment_id,
+
+    )
+
+    db.add(db_comment)
+    db.commit()
+    db.refresh(db_comment)
+
+    return db_comment
+
+def get_comments_by_post_id(db: Session, post_id: int):
+    return db.query(Comment).filter(Comment.post_id == post_id).all()
+
+def get_comments_by_event_id(db: Session, event_id: int):
+    return db.query(Comment).filter(Comment.event_id == event_id).all()
+
+def get_comments_by_user_id(db: Session, user_id: int):
+    return db.query(Comment).filter(Comment.user_id == user_id).all()
+
+def reply_to_comment(db: Session, comment: CommentCreate, user_id: int, parent_comment_id: int):
+    return create_comment(db, comment, user_id, parent_comment_id=parent_comment_id)

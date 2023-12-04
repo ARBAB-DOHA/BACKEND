@@ -20,6 +20,7 @@ class Post(Base):
         "users.id", ondelete="CASCADE"), nullable=False)
 
     owner = relationship("User")
+    comments = relationship("Comment", back_populates="post")
 
 
 class UserCommunityAssociation(Base):
@@ -39,6 +40,7 @@ class User(Base):
                         nullable=False, server_default=text('now()'))
     join_requests = relationship("JoinRequest", back_populates="users")
     communities = relationship("Community", secondary="user_community_association", back_populates="members")
+    comments = relationship("Comment", back_populates="user")
 
 
 
@@ -62,7 +64,7 @@ class Community(Base):
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     join_requests = relationship("JoinRequest", back_populates="community")
-    events = relationship("Event", back_populates="community")
+    event = relationship("Event", back_populates="community")
     members = relationship("User", secondary="user_community_association", back_populates="communities")
 
 
@@ -86,4 +88,22 @@ class Event(Base):
     community_id = Column(Integer, ForeignKey("community.id", ondelete="CASCADE"), nullable=False)
 
     # Define a relationship with the Community model
-    community = relationship("Community", back_populates="events")
+    community = relationship("Community", back_populates="event")
+    comments = relationship("Comment", back_populates="event")
+
+
+class Comment(Base):
+    __tablename__ = "comments"
+
+    id = Column(Integer, primary_key=True, index=True,nullable=True)
+    content = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    post_id = Column(Integer, ForeignKey("posts.id"))
+    event_id = Column(Integer, ForeignKey("event.id"))
+    parent_comment_id = Column(Integer, ForeignKey("comments.id"))
+
+    user = relationship("User")
+    post = relationship("Post")
+    event = relationship("Event")
+    parent_comment = relationship("Comment", back_populates="replies", remote_side=[id])
+    replies = relationship("Comment", remote_side=[id])
