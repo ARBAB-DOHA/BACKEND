@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey,Text,DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table,Text,DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
+import sqlalchemy as sa
 
 from .database import Base
 
@@ -21,6 +22,14 @@ class Post(Base):
     owner = relationship("User")
 
 
+class UserCommunityAssociation(Base):
+    __tablename__ = "user_community_association"
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    community_id = Column(Integer, ForeignKey("community.id"), primary_key=True)
+
+
+
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, nullable=False)
@@ -29,6 +38,7 @@ class User(Base):
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=text('now()'))
     join_requests = relationship("JoinRequest", back_populates="users")
+    communities = relationship("Community", secondary="user_community_association", back_populates="members")
 
 
 
@@ -39,7 +49,9 @@ class Vote(Base):
     post_id = Column(Integer, ForeignKey(
         "posts.id", ondelete="CASCADE"), primary_key=True)
     
-    
+
+
+
     
   
 class Community(Base):
@@ -51,7 +63,7 @@ class Community(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     join_requests = relationship("JoinRequest", back_populates="community")
     events = relationship("Event", back_populates="community")
-
+    members = relationship("User", secondary="user_community_association", back_populates="communities")
 
 
 class JoinRequest(Base):

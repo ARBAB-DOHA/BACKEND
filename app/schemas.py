@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
+from typing import List
 
 from pydantic.types import conint
 
@@ -15,31 +16,12 @@ class PostCreate(PostBase):
     pass
 
 
-class UserOut(BaseModel):
-    id: int
-    email: EmailStr
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
-class Post(PostBase):
-    id: int
-    created_at: datetime
-    owner_id: int
-    owner: UserOut
-
-    class Config:
-        from_attributes = True
 
 
-class PostOut(BaseModel):
-    Post: Post
-    votes: int
 
-    class Config:
-        from_attributes = True
+
 
 
 class UserCreate(BaseModel):
@@ -82,3 +64,65 @@ class EventCreate(BaseModel):
     title: str
     description: str
     date_time: datetime
+    
+class EventOut(BaseModel):
+    id: int
+    title: str
+    description: str
+    date_time: datetime
+    community: CommunityOut
+
+    class Config:
+        from_attributes = True  
+
+
+
+
+
+    
+class CommunityOut(BaseModel):
+    id : int
+    admin_email: EmailStr
+    created_at : datetime
+    class Config:
+        from_attributes = True
+    
+
+
+class Post(PostBase):
+    id: int
+    created_at: datetime
+    owner_id: int
+
+
+    class Config:
+        from_attributes = True
+        
+
+
+class PostOut(BaseModel):
+    Post: Post
+    votes: int
+
+    class Config:
+        from_attributes = True
+
+
+
+
+class UserDashboard(BaseModel):
+    recent_posts: List[PostOut]
+    upcoming_events: List[EventOut]
+    notifications: List[str]
+
+
+class UserOut(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
+    dashboard: UserDashboard
+
+    class Config:
+        from_attributes = True
+
+

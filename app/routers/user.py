@@ -2,6 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from .. import models, schemas, utils
 from ..database import get_db
+from app import crud
 
 router = APIRouter(
     prefix="/users",
@@ -33,5 +34,9 @@ def get_user(id: int, db: Session = Depends(get_db), ):
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User with id: {id} does not exist")
+    user_data = crud.get_user_data(id, db)
+    if user_data is None:
+        raise HTTPException(status_code=404, detail="User not found")
+  
 
-    return user
+    return user,user_data
