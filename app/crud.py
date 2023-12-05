@@ -35,9 +35,15 @@ def get_user_data(user_id: int, db: Session):
 
     recent_posts = db.query(Post).filter(Post.owner_id == user_id).limit(5).all()
     upcoming_events = db.query(Event).filter(Event.community_id.in_([c.id for c in user.communities])).filter(Event.date_time > datetime.utcnow()).limit(5).all()
-    notifications = ["New post in community ", "Event starting soon",]  # Fetch or generate notifications
+    notifications = ["New post in community ", "Event starting soon",]
 
-    return {"user": user, "dashboard": UserDashboard(recent_posts=recent_posts, upcoming_events=upcoming_events, notifications=notifications)}
+    # Ensure that dashboard is always populated
+    dashboard_data = UserDashboard(
+        recent_posts=recent_posts or [],  # Use an empty list if recent_posts is None
+        upcoming_events=upcoming_events or [],  # Use an empty list if upcoming_events is None
+        notifications=notifications or [],)  # Use an empty list if notifications is None
+
+    return {"user": user, "dashboard": dashboard_data}
 
 def create_comment(
     db: Session, comment: CommentCreate, user_id: int, post_id: Optional[int] = None, event_id: Optional[int] = None, parent_comment_id: Optional[int] = None

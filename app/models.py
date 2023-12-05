@@ -38,6 +38,8 @@ class User(Base):
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=text('now()'))
+    reset_token = Column(String, nullable=True)
+    reset_token_expiry = Column(DateTime(timezone=True), nullable=True)
     join_requests = relationship("JoinRequest", back_populates="users")
     communities = relationship("Community", secondary="user_community_association", back_populates="members")
     comments = relationship("Comment", back_populates="user")
@@ -101,6 +103,7 @@ class Comment(Base):
     post_id = Column(Integer, ForeignKey("posts.id"))
     event_id = Column(Integer, ForeignKey("event.id"))
     parent_comment_id = Column(Integer, ForeignKey("comments.id"))
+  
 
     user = relationship("User")
     post = relationship("Post")

@@ -111,9 +111,9 @@ class PostOut(BaseModel):
 
 
 class UserDashboard(BaseModel):
-    recent_posts: List[PostOut]
-    upcoming_events: List[EventOut]
-    notifications: List[str]
+    recent_posts: List[Post] = []
+    upcoming_events: List[EventOut] = []
+    notifications: List[str] = []
 
 
 class UserOut(BaseModel):
@@ -121,6 +121,8 @@ class UserOut(BaseModel):
     email: EmailStr
     created_at: datetime
     dashboard: UserDashboard
+    reset_token: Optional[str]  
+    reset_token_expiry: Optional[datetime] 
 
     class Config:
         from_attributes = True
