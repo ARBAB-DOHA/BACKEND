@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends, status, HTTPException, Response
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
+import urllib
+from app import email_utils
 
 from app.config import settings
 from .. import oauth2
@@ -42,10 +44,11 @@ def request_password_reset(email: EmailStr, db: Session = Depends(database.get_d
     user = db.query(models.User).filter(models.User.email == email).first()
     if user:
         reset_token = oauth2.generate_reset_token(email)
+        reset_token_url = "http://127.0.0.1:8000/verify-password-reset?token=" + urllib.parse.quote(reset_token)
         user.reset_token = reset_token
         user.reset_token_expiry = datetime.utcnow() + timedelta(hours=settings.reset_token_expire_hours)
         db.commit()
-        # TODO: Send an email to the user with the reset token and a link to the reset password endpoint
+        email_utils.send_password_reset_email(email, reset_token)
     return {"message": "Password reset request received"}
 
 @router.post("/verify-password-reset")
