@@ -29,27 +29,16 @@ def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-def create_posts(post: schemas.PostCreate, image: UploadFile = File(None),db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
 
     new_post = models.Post(owner_id=current_user.id, **post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    
-    # Process the uploaded image
-    if image:
-        # Generate a unique key for the image in S3
-        image_key = f"uploads/{current_user.id}/{new_post.id}/{image.filename}"
-
-        # Upload the image to S3
-        s3.upload_fileobj(image.file, 'your-s3-bucket-name', image_key)
-
-        # Store the S3 URL in the database
-        new_post.image_url = f"https://your-s3-bucket-name.s3.amazonaws.com/{image_key}"
-
 
     return new_post
+
 
 
 @router.get("/{id}", response_model=schemas.PostOut)
