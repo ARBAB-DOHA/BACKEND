@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table,Text,DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table,Text,DateTime, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -110,3 +110,12 @@ class Comment(Base):
     event = relationship("Event")
     parent_comment = relationship("Comment", back_populates="replies", remote_side=[id])
     replies = relationship("Comment", remote_side=[id])
+    
+    
+    
+class HolidayDB(Base):
+    __tablename__ = "holidays"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    date = Column(DateTime, server_default=func.now())

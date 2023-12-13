@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from datetime import datetime
 from typing import Optional
 from typing import List
@@ -146,3 +146,17 @@ class Comment(CommentBase):
 
 class CommentWithReplies(Comment):
     replies: List[Comment] = []
+    
+    
+    
+    
+class Holiday(BaseModel):
+    name: str
+    date: datetime
+    @validator("date", pre=True, always=True)
+    def parse_date(cls, value):
+        # Add custom logic to parse the date string into a datetime object
+        try:
+            return datetime.strptime(value, "%m/%d/%Y")
+        except ValueError as e:
+            raise ValueError("Invalid date format") from e
