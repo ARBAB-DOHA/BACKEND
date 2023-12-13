@@ -135,6 +135,7 @@ class CommentCreate(BaseModel):
     content: str
 
 class Comment(CommentBase):
+    id: int
     user_id: int
     post_id: Optional[int] = None
     event_id: Optional[int] = None
