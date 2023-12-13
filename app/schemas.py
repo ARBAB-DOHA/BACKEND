@@ -125,7 +125,7 @@ class UserOut(BaseModel):
     reset_token_expiry: Optional[datetime] 
 
     class Config:
-        from_attributes = True
+        from_orm = True
 
 
 class CommentBase(BaseModel):

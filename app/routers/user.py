@@ -51,17 +51,9 @@ def get_user(id: int, db: Session = Depends(get_db), ):
     if user_data is None:
         raise HTTPException(status_code=404, detail="User not found")
     
-    dashboard_data = user_data.get('dashboard', {'recent_posts': [], 'upcoming_events': [], 'notifications': []})
+   
     
-    user_out = schemas.UserOut(
-        id=user.id,
-        email=user.email,
-        created_at=user.created_at,
-        dashboard=schemas.UserDashboard(**dashboard_data),
-        reset_token=user.reset_token,
-        reset_token_expiry=user.reset_token_expiry
-    )
 
   
 
-    return user,user_data, user_out
+    return user,user_data
