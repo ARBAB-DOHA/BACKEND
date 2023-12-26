@@ -2,9 +2,9 @@
 from typing import Optional
 from sqlalchemy.orm import Session
 from . import models  # Import your existing SQLAlchemy models
-from .schemas import Comment, CommentCreate, EventCreate
+from .schemas import BusinessCreate, Comment, CommentCreate, EventCreate
 
-from app.models import User, Post, Event,Comment
+from app.models import Business, User, Post, Event,Comment
 from datetime import datetime
 from app.schemas import UserDashboard, CommentCreate
 
@@ -77,3 +77,25 @@ def get_comments_by_user_id(db: Session, user_id: int):
 
 def reply_to_comment(db: Session, comment: CommentCreate, user_id: int, parent_comment_id: int):
     return create_comment(db, comment, user_id, parent_comment_id=parent_comment_id)
+
+
+
+def create_business(db: Session, business: BusinessCreate):
+    db_business = Business(**business.dict())
+    db.add(db_business)
+    db.commit()
+    db.refresh(db_business)
+    return db_business
+
+def get_businesses(db: Session):
+    return db.query(Business).all()
+
+def get_business_by_id(db: Session, business_id: int):
+    return db.query(Business).filter(Business.id == business_id).first()
+
+def update_business_approval_status(db: Session, business_id: int, approval_status: str):
+    db_business = db.query(Business).filter(Business.id == business_id).first()
+    db_business.approval_status = approval_status
+    db.commit()
+    db.refresh(db_business)
+    return db_business

@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table,Text,DateTime, func
+from sqlalchemy import Column, Enum, Integer, String, Boolean, ForeignKey, Table,Text,DateTime, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 import sqlalchemy as sa
+
+from app.schemas import BusinessApprovalStatusEnum
 
 from .database import Base
 
@@ -68,6 +70,7 @@ class Community(Base):
     join_requests = relationship("JoinRequest", back_populates="community")
     event = relationship("Event", back_populates="community")
     members = relationship("User", secondary="user_community_association", back_populates="communities")
+    businesses = relationship("Business", back_populates="community")
 
 
 class JoinRequest(Base):
@@ -119,3 +122,21 @@ class HolidayDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     date = Column(DateTime, server_default=func.now())
+    
+    
+    
+    
+class BusinessApprovalStatus(str, Enum):
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+
+class Business(Base):
+    __tablename__ = "businesses"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    community_id = Column(Integer, ForeignKey('community.id'), nullable=False)
+    name = Column(String, nullable=False)
+    services = Column(String, nullable=False)
+    approval_status = Column(Enum(BusinessApprovalStatusEnum, name='business_approval_status'), default=BusinessApprovalStatusEnum.pending, nullable=False)
+    community = relationship("Community", back_populates="businesses")

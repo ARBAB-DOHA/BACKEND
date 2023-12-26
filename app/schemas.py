@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel, EmailStr, validator
 from datetime import datetime
 from typing import Optional
@@ -160,3 +161,26 @@ class Holiday(BaseModel):
             return datetime.strptime(value, "%m/%d/%Y")
         except ValueError as e:
             raise ValueError("Invalid date format") from e
+        
+        
+        
+        
+class BusinessApprovalStatusEnum(str, Enum):
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+
+class BusinessBase(BaseModel):
+    name: str
+    services: str
+    community_id: int
+
+class BusinessCreate(BusinessBase):
+    pass
+
+class Business(BusinessBase):
+    id: int
+    approval_status: BusinessApprovalStatusEnum
+
+    class Config:
+        from_attributes = True

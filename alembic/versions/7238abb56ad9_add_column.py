@@ -19,11 +19,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade():
-    op.add_column('posts', sa.Column('content', sa.String(), nullable=True))
     pass
-
-
 def downgrade():
-    op.drop_constraint('post_users_fk', table_name="posts")
-    op.drop_column('posts', 'owner_id')
+  
+    
     pass
